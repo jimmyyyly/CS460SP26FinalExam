@@ -4,26 +4,18 @@
 **Student ID:** 130222219
 **Course:** CS 460 – Algorithms | Spring 2026
 
-> This README is your project documentation. Write it the way a developer would document
-> their design decisions , bullet points, brief justifications, and concrete examples where
-> required. You are not writing an essay. You are explaining what you built and why you built
-> it that way. Delete all blockquotes like this one before submitting.
-
 ---
 
 ## Part 1: Problem Analysis
 
-> Document why this problem is not just a shortest-path problem. Three bullet points, one
-> per question. Each bullet should be 1-2 sentences max.
-
 - **Why a single shortest-path run from S is not enough:**
-  One run from `S` only fixes shortest-path distances *from* the entrance; it never chooses **which relic to visit next** (or in what sequence), and that sequence changes the total fuel even when every leg uses a shortest path between its endpoints.
+  One run from `S` only fixes shortest-path distances *from* the entrance. It never chooses which relic to visit next and that sequence changes the total fuel even when every leg uses a shortest path between its endpoints.
 
 - **What decision remains after all inter-location costs are known:**
-  You still must pick a **visit order** (a permutation of the relic chambers): which relic comes first from `S`, which comes second from there, and so on, then the final leg to `T`, summing the precomputed corridor costs between those stops.
+  You still must pick a visit order for which relic comes first from `S`, which comes second from there, and so on, then the final leg to `T`, summing the precomputed corridor costs between those stops.
 
 - **Why this requires a search over orders (one sentence):**
-  Total fuel depends on the **order** in which relics are collected, so the answer comes from comparing feasible orders (search), not from one shortest-path computation from `S` alone.
+  Total fuel depends on the order in which relics are collected so the answer comes from comparing feasible orders (search), not from one shortest-path computation from `S` alone.
 
 ---
 
@@ -31,33 +23,30 @@
 
 ### Part 2a: Source Selection
 
-> List the source node types as a bullet list. For each, one-line reason.
+- **Entrance (`spawn`):** Every valid route begins at `S`, so we need shortest-path costs from the entrance to every other landmark.
+- **Relic chamber (each distinct relic in `relics`):** After a relic is collected, the next corridor leg starts at that chamber, so we need shortest-path costs from each distinct relic node to the others and to `T`.
 
 | Source Node Type | Why it is a source |
 |---|---|
-| _node type_ | _one-line reason_ |
-| _node type_ | _one-line reason_ |
+| Entrance (`spawn`) | Supplies `dist(spawn, ·)` for the first relic the Torchbearer chooses in any order. |
+| Relic chamber (each distinct node in `relics`) | Supplies `dist(relic, ·)` for every later leg, because `current_loc` is always `spawn` or a relic already visited before the final hop to `T`. |
 
 ### Part 2b: Distance Storage
 
-> Fill in the table. No prose required.
-
 | Property | Your answer |
 |---|---|
-| Data structure name | |
-| What the keys represent | |
-| What the values represent | |
-| Lookup time complexity | |
-| Why O(1) lookup is possible | |
+| Data structure name | Nested `dict` (`dist_table`) |
+| What the keys represent | Outer key = source node `u`; inner key = destination node `v` |
+| What the values represent | Shortest-path cost from `u` to `v` (a `float`; `inf` if unreachable) |
+| Lookup time complexity | O(1) expected per lookup |
+| Why O(1) lookup is possible | Python `dict` maps keys by hashing, so one `dist_table[u][v]` access is average-case constant time for fixed landmark sets |
 
 ### Part 2c: Precomputation Complexity
 
-> State the total complexity and show the arithmetic. Two to three lines max.
-
-- **Number of Dijkstra runs:** _your answer_
-- **Cost per run:** _your answer_
-- **Total complexity:** _your answer_
-- **Justification (one line):** _your answer_
+- **Number of Dijkstra runs:** One per distinct node returned by `select_sources` (the distinct nodes in `{spawn} ∪ relics`), which is at most `k + 1` when `k` counts distinct relic chambers and `spawn` is not one of them.
+- **Cost per run:** `O(m log n)` with `n = |V|` and `m = |E|`, as given in the spec for one Dijkstra with a binary heap.
+- **Total complexity:** `O(σ · m log n)` where `σ` is the number of distinct sources (at most `k + 1`); same order as `O(k m log n)` when `k` is the dominant term.
+- **Justification (one line):** Each source run relaxes every edge in the worst case, and we repeat that once per landmark source we keep in `select_sources`.
 
 ---
 

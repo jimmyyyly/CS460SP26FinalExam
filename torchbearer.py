@@ -67,7 +67,14 @@ def select_sources(spawn, relics, exit_node):
 
     TODO
     """
-    pass
+    _ = exit_node  # exit is not a Dijkstra source in README Part 2a; kept for API
+    seen = set()
+    out = []
+    for x in [spawn] + list(relics):
+        if x not in seen:
+            seen.add(x)
+            out.append(x)
+    return out
 
 
 def run_dijkstra(graph, source):
@@ -86,7 +93,25 @@ def run_dijkstra(graph, source):
 
     TODO
     """
-    pass
+    nodes = set(graph.keys())
+    for nbrs in graph.values():
+        for v, _ in nbrs:
+            nodes.add(v)
+    nodes.add(source)
+
+    dist = {u: float("inf") for u in nodes}
+    dist[source] = 0.0
+    pq = [(0.0, source)]
+    while pq:
+        d, u = heapq.heappop(pq)
+        if d != dist[u]:
+            continue
+        for v, w in graph.get(u, ()):
+            nd = d + float(w)
+            if nd < dist[v]:
+                dist[v] = nd
+                heapq.heappush(pq, (nd, v))
+    return dist
 
 
 def precompute_distances(graph, spawn, relics, exit_node):
@@ -106,7 +131,10 @@ def precompute_distances(graph, spawn, relics, exit_node):
 
     TODO
     """
-    pass
+    dist_table = {}
+    for s in select_sources(spawn, relics, exit_node):
+        dist_table[s] = run_dijkstra(graph, s)
+    return dist_table
 
 
 # =============================================================================
