@@ -52,38 +52,23 @@
 
 ## Part 3: Algorithm Correctness
 
-> Document your understanding of why Dijkstra produces correct distances.
-> Bullet points and short sentences throughout. No paragraphs.
-
 ### Part 3a: What the Invariant Means
 
-> Two bullets: one for finalized nodes, one for non-finalized nodes.
-> Do not copy the invariant text from the spec.
+- **For nodes already finalized (in S):** `dist[v]` is the true cheapest cost to reach `v` from the source; no cheaper route exists once `v` is pulled from the heap and finalized.
 
-- **For nodes already finalized (in S):**
-  _Your answer here._
-
-- **For nodes not yet finalized (not in S):**
-  _Your answer here._
+- **For nodes not yet finalized (not in S):** `dist[u]` is the cheapest cost found so far using paths whose **internal** vertices (everything strictly between the source and `u`) are all already finalized.
 
 ### Part 3b: Why Each Phase Holds
 
-> One to two bullets per phase. Maintenance must mention nonnegative edge weights.
+- **Initialization : why the invariant holds before iteration 1:** Only the source is finalized with distance `0`, and every other label is either `∞` or the weight of a single edge from the source, so every stored value matches a real path that uses no non-source internal vertices yet.
 
-- **Initialization : why the invariant holds before iteration 1:**
-  _Your answer here._
+- **Maintenance : why finalizing the min-dist node is always correct:** The unfinalized node `x` with smallest tentative distance cannot still get a cheaper path through another unfinalized node, because **all edge weights are nonnegative**, so any other route to `x` would have to go through a vertex at least as expensive as `x` was when selected; therefore `dist[x]` is final and `x` can be added to the finalized set.
 
-- **Maintenance : why finalizing the min-dist node is always correct:**
-  _Your answer here._
-
-- **Termination : what the invariant guarantees when the algorithm ends:**
-  _Your answer here._
+- **Termination : what the invariant guarantees when the algorithm ends:** Every reachable vertex has been finalized, so each `dist[v]` is the true shortest-path cost from the source; unreachable vertices stay at `∞`.
 
 ### Part 3c: Why This Matters for the Route Planner
 
-> One sentence connecting correct distances to correct routing decisions.
-
-_Your answer here._
+If Dijkstra's distances are wrong, the planner's legs between landmarks use bad numbers, so it can pick a relic order that is not minimum fuel or think a corridor route exists when it does not.
 
 ---
 

@@ -148,10 +148,24 @@ def dijkstra_invariant_check():
     str
         Your Part 3 README answers, written as a string.
         Must match what you wrote in README Part 3.
-
-    TODO
     """
-    return "TODO"
+    return """### Part 3a: What the Invariant Means
+
+- **For nodes already finalized (in S):** `dist[v]` is the true cheapest cost to reach `v` from the source; no cheaper route exists once `v` is pulled from the heap and finalized.
+
+- **For nodes not yet finalized (not in S):** `dist[u]` is the cheapest cost found so far using paths whose **internal** vertices (everything strictly between the source and `u`) are all already finalized.
+
+### Part 3b: Why Each Phase Holds
+
+- **Initialization : why the invariant holds before iteration 1:** Only the source is finalized with distance `0`, and every other label is either `∞` or the weight of a single edge from the source, so every stored value matches a real path that uses no non-source internal vertices yet.
+
+- **Maintenance : why finalizing the min-dist node is always correct:** The unfinalized node `x` with smallest tentative distance cannot still get a cheaper path through another unfinalized node, because **all edge weights are nonnegative**, so any other route to `x` would have to go through a vertex at least as expensive as `x` was when selected; therefore `dist[x]` is final and `x` can be added to the finalized set.
+
+- **Termination : what the invariant guarantees when the algorithm ends:** Every reachable vertex has been finalized, so each `dist[v]` is the true shortest-path cost from the source; unreachable vertices stay at `∞`.
+
+### Part 3c: Why This Matters for the Route Planner
+
+If Dijkstra's distances are wrong, the planner's legs between landmarks use bad numbers, so it can pick a relic order that is not minimum fuel or think a corridor route exists when it does not."""
 
 
 # =============================================================================

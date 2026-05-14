@@ -19,12 +19,12 @@ First I will write Dijkstra and build the distance table between the start, reli
 
 ---
 
-## Entry 2 – [Date]: [Short description]
+## Entry 2 – 2026-05-14: Part 3 mix-up
 
 > Required. At least one entry must describe a bug, wrong assumption, or design change
 > you encountered. Describe what went wrong and how you resolved it.
 
-_Your entry here._
+For Part 3 in the README I first wrote that every node’s `dist` value is already the final shortest distance. That is only true for **finalized** nodes, not the ones still in the heap. I reread the invariant and fixed the bullet so unfinalized nodes mean “best path found so far using finalized nodes inside the path.” I also added **nonnegative weights** to the maintenance bullet like the spec asks. After that, Part 3 matched how Dijkstra actually works.
 
 ---
 
