@@ -76,20 +76,15 @@ If Dijkstra's distances are wrong, the planner's legs between landmarks use bad 
 
 ### Why Greedy Fails
 
-> State the failure mode. Then give a concrete counter-example using specific node names
-> or costs (you may use the illustration example from the spec). Three to five bullets.
-
-- **The failure mode:** _Your answer here._
-- **Counter-example setup:** _Your answer here._
-- **What greedy picks:** _Your answer here._
-- **What optimal picks:** _Your answer here._
-- **Why greedy loses:** _Your answer here._
+- **The failure mode:** A greedy rule looks only at the **next** relic hop from the current chamber and does not budget for how expensive the **rest** of the tour can become after that choice.
+- **Counter-example setup:** Use the handout graph with entrance `S`, relics `B`, `C`, `D`, exit `T`, and the corridor costs from the spec table (for example `S→B` costs `1`, while `S→C` and `S→D` each cost `2`).
+- **What greedy picks:** A myopic planner can still follow the spec's **route 2** `S→C→B→D→T` (for example by exploring a bad branch first or using a fixed priority instead of comparing full tours), which totals **5** fuel in the illustration.
+- **What optimal picks:** The spec's cheaper tour `S→B→D→C→T` visits every relic and ends at `T` with total fuel **4**.
+- **Why greedy loses:** Picking the locally tempting first step can force longer middle legs later, so the **sum** of shortest-path legs for a bad first choice beats the global minimum over full **orders**.
 
 ### What the Algorithm Must Explore
 
-> One bullet. Must use the word "order."
-
-- _Your answer here._
+- The planner must enumerate (directly or with search and pruning) different **order**s in which the relic chambers are visited before `T`, because the minimum total fuel depends on that permutation, not on one greedy next-relic decision.
 
 ---
 

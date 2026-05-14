@@ -179,10 +179,18 @@ def explain_search():
     str
         Your Part 4 README answers, written as a string.
         Must match what you wrote in README Part 4.
-
-    TODO
     """
-    return "TODO"
+    return """### Why Greedy Fails
+
+- **The failure mode:** A greedy rule looks only at the **next** relic hop from the current chamber and does not budget for how expensive the **rest** of the tour can become after that choice.
+- **Counter-example setup:** Use the handout graph with entrance `S`, relics `B`, `C`, `D`, exit `T`, and the corridor costs from the spec table (for example `S→B` costs `1`, while `S→C` and `S→D` each cost `2`).
+- **What greedy picks:** A myopic planner can still follow the spec's **route 2** `S→C→B→D→T` (for example by exploring a bad branch first or using a fixed priority instead of comparing full tours), which totals **5** fuel in the illustration.
+- **What optimal picks:** The spec's cheaper tour `S→B→D→C→T` visits every relic and ends at `T` with total fuel **4**.
+- **Why greedy loses:** Picking the locally tempting first step can force longer middle legs later, so the **sum** of shortest-path legs for a bad first choice beats the global minimum over full **orders**.
+
+### What the Algorithm Must Explore
+
+- The planner must enumerate (directly or with search and pruning) different **order**s in which the relic chambers are visited before `T`, because the minimum total fuel depends on that permutation, not on one greedy next-relic decision."""
 
 
 # =============================================================================
