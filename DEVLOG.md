@@ -28,9 +28,9 @@ For Part 3 in the README I first wrote that every node’s `dist` value is alrea
 
 ---
 
-## Entry 3 – [Date]: [Short description]
+## Entry 3 – 2026-05-14: Parts 4–6 (search, state, pruning)
 
-_Your entry here._
+I wrote **Part 4** in the README about why a greedy next relic step can fail and why we must search different visit **orders** on the `S,B,C,D,T` style example. I copied that text into `explain_search()` so the file matches the README. For **Part 5** I filled the state table with the same names `_explore` uses (`current_loc`, `relics_visited_order`, `cost_so_far`, and `relics_remaining` as a `frozenset`). For **Part 6** I described the `best` list, the lower bound `cost_so_far + min_next`, and pruning only when `lb > best[0]` so we do not cut ties. I checked the graded comment in `_explore` against those bullets so they tell the same story.
 
 ---
 

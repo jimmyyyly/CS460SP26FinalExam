@@ -92,33 +92,26 @@ If Dijkstra's distances are wrong, the planner's legs between landmarks use bad 
 
 ### Part 5a: State Representation
 
-> Document the three components of your search state as a table.
-> Variable names here must match exactly what you use in torchbearer.py.
-
 | Component | Variable name in code | Data type | Description |
 |---|---|---|---|
-| Current location | | | |
-| Relics already collected | | | |
-| Fuel cost so far | | | |
+| Current location | `current_loc` | node | The chamber where the Torchbearer stands during the search. |
+| Relics already collected | `relics_visited_order` | `list[node]` | Relics picked up so far, listed in the order they were visited. |
+| Fuel cost so far | `cost_so_far` | `float` | Total torch fuel spent on the partial route from `spawn` to `current_loc`. |
 
 ### Part 5b: Data Structure for Visited Relics
 
-> Fill in the table.
-
 | Property | Your answer |
 |---|---|
-| Data structure chosen | |
-| Operation: check if relic already collected | Time complexity: |
-| Operation: mark a relic as collected | Time complexity: |
-| Operation: unmark a relic (backtrack) | Time complexity: |
-| Why this structure fits | |
+| Data structure chosen | `frozenset` stored as `relics_remaining` (relics not yet collected) |
+| Operation: check if relic already collected | Time complexity: O(1) average (`r not in relics_remaining` means `r` is already collected) |
+| Operation: mark a relic as collected | Time complexity: O(k) to build `frozenset(relics_remaining - {r})` where `k` is the number of distinct relics |
+| Operation: unmark a relic (backtrack) | Time complexity: O(1) extra work; recursion passes the previous `frozenset` when unwinding |
+| Why this structure fits | Immutable sets are quick to copy per branch, membership checks are constant time, and `k` stays small in the provided tests. |
 
 ### Part 5c: Worst-Case Search Space
 
-> Two bullets.
-
-- **Worst-case number of orders considered:** _Your answer (in terms of k)._
-- **Why:** _One-line justification._
+- **Worst-case number of orders considered:** Up to `k!` different permutations of the `k` distinct relic chambers (each permutation is one visit **order** before the final leg to `T`).
+- **Why:** In the worst case the search tries extending every prefix of every ordering until pruning or optimality rules cut branches.
 
 ---
 
@@ -126,25 +119,20 @@ If Dijkstra's distances are wrong, the planner's legs between landmarks use bad 
 
 ### Part 6a: Best-So-Far Tracking
 
-> Three bullets.
-
-- **What is tracked:** _Your answer here._
-- **When it is used:** _Your answer here._
-- **What it allows the algorithm to skip:** _Your answer here._
+- **What is tracked:** A mutable list `best` where `best[0]` is the cheapest full-tour fuel found so far and `best[1]` is the relic visit order that achieved it.
+- **When it is used:** After every complete tour (no relics left and the exit leg is added), `best` is updated if the new total is lower; before recursing deeper, `best[0]` is read to decide whether to prune the current branch.
+- **What it allows the algorithm to skip:** Any partial state whose optimistic lower bound already costs strictly more than `best[0]`, because no completion from that state can beat the incumbent tour.
 
 ### Part 6b: Lower Bound Estimation
 
-> Three bullets.
-
-- **What information is available at the current state:** _Your answer here._
-- **What the lower bound accounts for:** _Your answer here._
-- **Why it never overestimates:** _Your answer here._
+- **What information is available at the current state:** `cost_so_far`, `current_loc`, the set `relics_remaining`, and one row of the precomputed table `dist_table[current_loc][·]`.
+- **What the lower bound accounts for:** Fuel already spent plus the cheapest next leg from `current_loc` to **some** still-unvisited relic, `min_next = min_{r in relics_remaining} dist_table[current_loc][r]`, so `lb = cost_so_far + min_next`.
+- **Why it never overestimates:** Any full completion must leave `current_loc` and visit a first relic from `relics_remaining`, paying at least `dist_table[current_loc][r*]` for that relic `r*`; that cost is always at least `min_next`, so `lb` is no larger than the true cheapest completion cost from this state.
 
 ### Part 6c: Pruning Correctness
 
-> One to two bullets. Explain why pruning is safe.
-
-- _Your answer here._
+- **Pruning is safe** because `lb` is a valid lower bound on every completion from the current node, so if `lb > best[0]` then every completion here costs more than the best tour already found and the optimal answer cannot lie in this subtree.
+- **Strict inequality (`>` not `≥`)** matters when `lb == best[0]`: a tie might still yield an optimal tour, so those branches are kept until a strictly worse bound proves they cannot improve the incumbent.
 
 ---
 

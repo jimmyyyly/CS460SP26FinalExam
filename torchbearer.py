@@ -214,42 +214,76 @@ def find_optimal_route(dist_table, spawn, relics, exit_node):
     tuple[float, list[node]]
         (minimum_fuel_cost, ordered_relic_list)
         Returns (float('inf'), []) if no valid route exists.
-
-    TODO
     """
-    pass
+    if spawn not in dist_table:
+        return (float("inf"), [])
+
+    best = [float("inf"), []]
+    relics_remaining = frozenset(relics)
+    _explore(
+        dist_table,
+        spawn,
+        relics_remaining,
+        [],
+        0.0,
+        exit_node,
+        best,
+    )
+    if best[0] == float("inf"):
+        return (float("inf"), [])
+    return (best[0], best[1])
+
+
+def _partial_lower_bound(dist_table, current_loc, relics_remaining, cost_so_far):
+    """Part 6b: optimistic least fuel still needed before all relics are collected (one next leg)."""
+    row = dist_table.get(current_loc, {})
+    min_next = float("inf")
+    for r in relics_remaining:
+        min_next = min(min_next, row.get(r, float("inf")))
+    return cost_so_far + min_next
 
 
 def _explore(dist_table, current_loc, relics_remaining, relics_visited_order,
              cost_so_far, exit_node, best):
     """
-    Recursive helper for find_optimal_route.
+    Recursive helper for find_optimal_route (Parts 5 and 6).
 
-    Parameters
-    ----------
-    dist_table : dict[node, dict[node, float]]
-    current_loc : node
-    relics_remaining : collection
-        Your chosen data structure from README Part 5b.
-    relics_visited_order : list[node]
-    cost_so_far : float
-    exit_node : node
-    best : list
-        Mutable container for the best solution found so far.
-
-    Returns
-    -------
-    None
-        Updates best in place.
-
-    TODO
-    Implement: base case, pruning, recursive case, backtracking.
-
-    REQUIRED: Add a 1-2 sentence comment near your pruning condition
-    explaining why it is safe (cannot skip the optimal solution).
-    This comment is graded.
+    Part 6 pruning uses ``best`` (incumbent cost + order) and a lower bound on any
+    completion from the current partial state; see comment at the ``if`` that returns early.
     """
-    pass
+    if not relics_remaining:
+        row = dist_table.get(current_loc, {})
+        d_exit = row.get(exit_node, float("inf"))
+        total = cost_so_far + d_exit
+        if total < best[0]:
+            best[0] = total
+            best[1] = list(relics_visited_order)
+        return
+
+    # Part 6a / 6b: compare partial lower bound to best full tour found so far (6a).
+    lb = _partial_lower_bound(dist_table, current_loc, relics_remaining, cost_so_far)
+    # Safe pruning (Part 6c): lb is a true lower bound on every completion from this state,
+    # because the next relic visited costs at least min_{r in remaining} dist(current_loc, r).
+    # If lb > best[0], no completion here can be strictly cheaper than the incumbent, so the
+    # optimal tour is not discarded. Using strict '>' keeps branches that could still tie best.
+    if best[0] != float("inf") and lb > best[0]:
+        return
+
+    row = dist_table.get(current_loc, {})
+    for r in relics_remaining:
+        d = row.get(r, float("inf"))
+        if d == float("inf"):
+            continue
+        new_remaining = frozenset(relics_remaining - {r})
+        _explore(
+            dist_table,
+            r,
+            new_remaining,
+            relics_visited_order + [r],
+            cost_so_far + d,
+            exit_node,
+            best,
+        )
 
 
 # =============================================================================
@@ -270,10 +304,9 @@ def solve(graph, spawn, relics, exit_node):
     tuple[float, list[node]]
         (minimum_fuel_cost, ordered_relic_list)
         Returns (float('inf'), []) if no valid route exists.
-
-    TODO
     """
-    pass
+    dist_table = precompute_distances(graph, spawn, relics, exit_node)
+    return find_optimal_route(dist_table, spawn, relics, exit_node)
 
 
 # =============================================================================
