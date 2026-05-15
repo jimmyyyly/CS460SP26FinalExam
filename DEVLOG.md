@@ -3,26 +3,15 @@
 **Student Name:** Jimmy Ly
 **Student ID:** 130222219
 
-> Instructions: Write at least four dated entries. Required entry types are marked below.
-> Two to five sentences per entry is sufficient. Write entries as you go, not all in one
-> sitting. Graders check that entries reflect genuine work across multiple sessions.
-> Delete all blockquotes before submitting.
-
 ---
 
 ## Entry 1 – 2026-05-13: Initial Plan
-
-> Required. Write this before writing any code. Describe your plan: what you will
-> implement first, what parts you expect to be difficult, and how you plan to test.
 
 First I will write Dijkstra and build the distance table between the start, relics, and exit. Then I will write the search that tries different orders to visit all relics and picks the cheapest total cost. I think pruning and the README variable-name table will be the trickiest parts. I will test with the auto-grader and a few tiny graphs I can check by hand.
 
 ---
 
 ## Entry 2 – 2026-05-14: Part 3 mix-up
-
-> Required. At least one entry must describe a bug, wrong assumption, or design change
-> you encountered. Describe what went wrong and how you resolved it.
 
 For Part 3 in the README I first wrote that every node’s `dist` value is already the final shortest distance. That is only true for **finalized** nodes, not the ones still in the heap. I reread the invariant and fixed the bullet so unfinalized nodes mean “best path found so far using finalized nodes inside the path.” I also added **nonnegative weights** to the maintenance bullet like the spec asks. After that, Part 3 matched how Dijkstra actually works.
 
@@ -34,27 +23,22 @@ I wrote **Part 4** in the README about why a greedy next relic step can fail and
 
 ---
 
-## Entry 4 – [Date]: Post-Implementation Reflection
+## Entry 4 – 2026-05-14: Post-Implementation Reflection
 
-> Required. Written after your implementation is complete. Describe what you would
-> change or improve given more time.
-
-_Your entry here._
+With more time I would try a **stronger lower bound** for pruning (for example accounting for more than one future leg or a cheaper estimate toward the exit), because `cost_so_far + min_next` is safe but weak on bigger instances. I would also cache the **best partial cost so far** for each pair `(current_loc, frozenset(relics_remaining))` so if the same situation shows up again with higher fuel, that branch can stop early. Finally I would add a few more **hand tests** (duplicate relic ids, empty relic list, spawn equal to a relic) to match edge cases the auto-grader might use.
 
 ---
 
-## Final Entry – [Date]: Time Estimate
-
-> Required. Estimate minutes spent per part. Honesty is expected; accuracy is not graded.
+## Final Entry – 2026-05-18: Time Estimate
 
 | Part | Estimated Hours |
 |---|---|
-| Part 1: Problem Analysis | |
-| Part 2: Precomputation Design | |
-| Part 3: Algorithm Correctness | |
-| Part 4: Search Design | |
-| Part 5: State and Search Space | |
-| Part 6: Pruning | |
-| Part 7: Implementation | |
-| README and DEVLOG writing | |
-| **Total** | |
+| Part 1: Problem Analysis | 1 |
+| Part 2: Precomputation Design | 2 |
+| Part 3: Algorithm Correctness | 2 |
+| Part 4: Search Design | 1 |
+| Part 5: State and Search Space | 1 |
+| Part 6: Pruning | 1 |
+| Part 7: Implementation | 4.5 |
+| README and DEVLOG writing | 2 |
+| **Total** | **14.5** |

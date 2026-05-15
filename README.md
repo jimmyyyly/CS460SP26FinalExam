@@ -138,6 +138,5 @@ If Dijkstra's distances are wrong, the planner's legs between landmarks use bad 
 
 ## References
 
-> Bullet list. If none beyond lecture notes, write that.
 
-- _Your references here._
+- Lecture notes
